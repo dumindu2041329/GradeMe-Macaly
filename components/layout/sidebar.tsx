@@ -18,7 +18,7 @@ import {
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
-export default function Sidebar({ onClose }: { onClose?: () => void }) {
+export default function Sidebar({ onClose, onNavigate }: { onClose?: () => void; onNavigate?: (href: string) => void }) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -107,15 +107,22 @@ export default function Sidebar({ onClose }: { onClose?: () => void }) {
           const isActive = pathname === item.href;
           
           return (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={item.href} prefetch={true}>
               <Button
                 variant={isActive ? "default" : "ghost"}
-                className={`w-full justify-start space-x-3 ${
+                className={`w-full justify-start space-x-3 transition-all duration-150 ${
                   isActive 
                     ? 'bg-blue-600 text-white hover:bg-blue-700' 
                     : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
                 }`}
-                onClick={() => onClose && onClose()}
+                onClick={() => {
+                  console.log('Navigation clicked:', item.href);
+                  if (onNavigate) {
+                    onNavigate(item.href);
+                  } else {
+                    onClose && onClose();
+                  }
+                }}
               >
                 <Icon className="w-5 h-5" />
                 <span>{item.label}</span>
